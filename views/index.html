@@ -65,17 +65,21 @@
                 </md-button> Add...
             </md-fab-trigger>
             <md-fab-actions>
-                <md-button aria-label="add from uri" class="md-fab md-raised md-mini" ng-click="tcc.openUriDialog($event,'uri')">
+                <md-button aria-label="add from uri" ng-show="isGeneral" class="md-fab md-raised md-mini" ng-click="tcc.openUriDialog($event,'uri')">
                     <md-icon>cloud_download</md-icon>
                     <md-tooltip>add from uri</md-tooltip>
                 </md-button>
-                <md-button aria-label="add from file" class="md-fab md-raised md-mini" ng-click="tcc.addFileFromPicker('tdFilePicker')">
+                <md-button aria-label="add from file" ng-show="isGeneral" class="md-fab md-raised md-mini" ng-click="tcc.addFileFromPicker('tdFilePicker')">
                     <md-icon>attachment</md-icon>
                     <md-tooltip>add from file</md-tooltip>
                 </md-button>
-                 <md-button aria-label="add from repo" class="md-fab md-raised md-mini" ng-click="tcc.addCatalog($event)">
+                 <md-button aria-label="add from repo" ng-show="isGeneral" class="md-fab md-raised md-mini" ng-click="tcc.addCatalog($event)">
                     <md-icon>local_library</md-icon>
                     <md-tooltip>add from repo</md-tooltip>
+                </md-button>
+                <md-button aria-label="add from thingweb-repo" class="md-fab md-raised md-mini" ng-click="tcc.addThingwebRepo($event)">
+                    <md-icon>archive</md-icon>
+                    <md-tooltip>add from thingweb-repo</md-tooltip>
                 </md-button>
             </md-fab-actions>
         </md-fab-speed-dial>

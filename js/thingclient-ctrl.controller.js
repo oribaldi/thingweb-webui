@@ -1,10 +1,16 @@
 angular.module("thingclient").controller('ThingClientCtrl',
-    ['$scope', '$interval', '$http' , '$mdSidenav', '$mdDialog', '$mdToast', 'TdParser', 'ThingClient',
+    ['$scope', '$interval', '$http' , '$mdSidenav', '$mdDialog', '$mdToast', 'TdParser', 'ThingClient', 'CoAP',
         function ThingClientCtrl($scope, $interval, $http ,$mdSidenav, $mdDialog, $mdToast, TdParser, ThingClient) {
             var self = this;
             $scope.things = [];
             self.selected = {};
             self.autoReloaded = [];
+            $scope.isGeneral = true;
+            
+            // ### Thingweb Repo only ###
+            var source;
+            $scope.noThings = true;
+            // ##########################
             
             var showRestError = function showRestError(errorObj) {
                 msg = errorObj.config.method + " to " + errorObj.config.url + " failed.<br/>";
@@ -48,6 +54,7 @@ angular.module("thingclient").controller('ThingClientCtrl',
             }
             
             self.addThingFromObject = function addThingFromObject(td) {
+            	console.log(td);
                 self.addThing(TdParser.createThing(td));
             }
 
@@ -133,6 +140,7 @@ angular.module("thingclient").controller('ThingClientCtrl',
                             $http.get(this.uri)
                             .then(function(response) {
                                 var catalog = response.data;
+                                console.log(catalog);
                                 for(var name in catalog) {
                                     console.log("found " + name);
                                     self.addThingFromObject(catalog[name]);    
@@ -145,6 +153,72 @@ angular.module("thingclient").controller('ThingClientCtrl',
                     templateUrl: 'uridialog.html',
                     targetEvent: $event
                 });
+            }
+            
+            self.addThingwebRepo = function addThingWebRepo($event) {
+            	
+            	// Setup server event
+                source = new EventSource('/loadTD');
+                source.addEventListener('observing', function (event) {
+                	
+                	//self.addThingFromObject(event.data);
+                	
+                	$scope.$apply(function () {
+
+                		$scope.things = [];
+                		$scope.isGeneral = false;
+                		
+                		var catalog = JSON.parse(event.data);
+                		for (var name in catalog) {
+                			self.addThingFromObject(catalog[name]);
+                		}
+                		
+                		self.selected = {};
+                		
+                		if ($scope.things.length !== 0) {
+        					$scope.noThings = false;
+        				} else {
+        					$scope.Things = true;
+        				}
+                	});
+                }, false);
+            	
+            	/*
+            	$mdDialog.show({
+                    clickOutsideToClose: true,
+                    controller: function($mdDialog) {
+                        // Save the clicked item
+                        this.uri = "";
+                        // Setup some handlers
+                        this.close = function() {
+                            $mdDialog.cancel();
+                        };
+                        this.submit = function() {
+                            $mdDialog.hide();
+                            
+                            // Setup server event
+                            source = new EventSource('/loadTD/' + this.uri);
+                            source.addEventListener('observing', function (event) {
+                            	$scope.$apply(function () {
+                            		
+                            		self.selected = {};
+                            		$scope.things = JSON.parse(event.data);
+                            		if ($scope.things.length !== 0) {
+                    					$scope.noThings = false;
+                    				} else {
+                    					$scope.Things = true;
+                    				}
+                            	});
+                            }, false);
+                            
+                        };
+                    },
+                    controllerAs: 'dialog',
+                    templateUrl: 'uridialog.html',
+                    targetEvent: $event
+                });
+            	*/
+            	
             }
 
             return self;
