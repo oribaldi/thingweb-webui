@@ -44,7 +44,7 @@
         flex>
 
         <md-toolbar layout="row" class="md-whiteframe-z1">
-            <h3>Things</h3>
+            <h3>&emsp;Things</h3>
         </md-toolbar>
 
         <md-list>
@@ -95,7 +95,7 @@
             <md-button id="main" class="menu" hide-gt-sm ng-click="tcc.toggleList()" aria-label="Show User List">
                 <md-icon>menu</md-icon>
             </md-button>
-            <h3>Web of Things Client
+            <h3>&emsp;Web of Things Client
         <span ng-show="tcc.selected.name">
           : {{tcc.selected.name}}
         </span>
@@ -107,6 +107,39 @@
         </md-toolbar>
 
         <md-content id="content" ng-show="tcc.selected.name" layout-margin layout="column">
+        
+        	<div class="row_step_title">
+  				<div class="col-md-12">
+    				<h2>Discover</h2>
+  				</div>
+			</div>
+			
+			<div class="row_thing_query">
+				<section class="md-whiteframe-2dp" >
+					<md-toolbar class="md-primary">
+                    	<div class="md-toolbar-tools">
+                        	<h3>Search specific Things</h3>
+                    	</div>
+                	</md-toolbar><br/>
+                	
+    				<form name="myForm" ng-submit="sendQuery()">
+    					&emsp;<input type="radio" ng-model="queryType" value="sparql" ng-checked="true" ng-click="radioChecked(1)"/>Sparql-Query
+    					&emsp;<input type="radio" ng-model="queryType" value="text" ng-click="radioChecked(2)"/>Text-Query<br><br>
+						<label>&emsp;Query:</label>
+						<input type="text" ng-model="queryContent" placeholder="{{placeholder}}" required>
+						<span class="error" ng-show="myForm.input.$error.required">Required!</span>
+						<md-button type="submit" class="md-raised">Search</md-button>
+					</form>
+				</section>
+				<br/>
+			</div>
+			
+			
+			<div class="row_step_title">
+  				<div class="col-md-12">
+    				<h2 ng-show="tcc.selected.name">Content</h2>
+  				</div>
+			</div>
 
             <section class="md-whiteframe-2dp" >
                 <md-toolbar class="md-primary">
@@ -114,7 +147,7 @@
                         <h2>{{tcc.selected.name}}</h2>
                     </div>
                 </md-toolbar>
-                <span class="md-subhead">{{tcc.selected.uri}}</span>
+                <span class="md-subhead">&emsp;{{tcc.selected.uri}}</span>
             </section>
             <br/>
 

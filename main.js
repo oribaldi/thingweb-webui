@@ -27,11 +27,12 @@ app.use('/js', express.static(__dirname + '/js'));
 
 
 // ### Routing for Thingweb Repository ###
+
 //For observe events
 function ObserveRequest() { }
 util.inherits(ObserveRequest, events.EventEmitter);
 
-// Used to GET TDs from repository
+// GET TDs from repository by an observe request
 app.get('/loadTD',function(rq, res) {
 	
 	// set timeout as high as possible
@@ -59,16 +60,10 @@ app.get('/loadTD',function(rq, res) {
 	
 	function startObserver(res2) {
 		
-		console.log("Received notification...\n");
+		console.log("Received notification...");
 		
 		// send response through event
 		var result = JSON.parse(res2.payload);
-		for (var name in result) {
-			console.log("found " + name);
-			//res.write("event: observing\n");
-			//res.write("data: " + JSON.stringify(result[name]) + "\n\n");
-		}
-		
 		res.write("event: observing\n");
 		res.write("data: " + JSON.stringify(result) + "\n\n");
 		
@@ -96,6 +91,28 @@ app.get('/loadTD',function(rq, res) {
 	});
 	request.emit('subscribe', coapReq);
 	
+});
+
+app.get('/searchTD',function(rq, res){
+	var url = 'coap://localhost:5683/td';
+	var queryType = rq.query.queryType;
+	var param = '';
+	
+	// Check type of query
+	if (queryType == "sparql") {
+		param += '?query=' + rq.query.queryContent;
+	} else {
+		param += '?text=\"' + rq.query.queryContent + '\"';
+	}
+	
+    // Send CoAP Request
+	req   = coap.request(url + param);
+	req.on('response', function(res2) {
+		var result = res2.payload;
+		var j = JSON.parse(result);
+		res.json(j);
+	});
+	req.end();
 });
 
 // #######################################

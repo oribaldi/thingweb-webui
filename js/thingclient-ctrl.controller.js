@@ -10,6 +10,10 @@ angular.module("thingclient").controller('ThingClientCtrl',
             // ### Thingweb Repo only ###
             var source;
             $scope.noThings = true;
+            // For the queries
+            $scope.queryType    = "sparql";
+            $scope.placeholder  = '?s ?p ?o.';
+            $scope.queryContent = "";
             // ##########################
             
             var showRestError = function showRestError(errorObj) {
@@ -170,6 +174,7 @@ angular.module("thingclient").controller('ThingClientCtrl',
                 		
                 		var catalog = JSON.parse(event.data);
                 		for (var name in catalog) {
+                			console.log("found " + name);
                 			self.addThingFromObject(catalog[name]);
                 		}
                 		
@@ -220,6 +225,46 @@ angular.module("thingclient").controller('ThingClientCtrl',
             	*/
             	
             }
+            
+            // Filter TDs by semantic queries
+            $scope.sendQuery = function () {
+            	
+            	var params = '?queryType=' + $scope.queryType + "&queryContent=" + $scope.queryContent;
+            	self.selected = {};
+
+            	$http({
+          		  method: 'GET',
+          		  url: '/searchTD' + params
+            	}).then(
+            			function successCallback(response) {
+            				
+            				$scope.queryContent = '';
+            				$scope.things = [];
+            				var catalog = response.data;
+            				for (var name in catalog) {
+                    			console.log("found " + name);
+                    			self.addThingFromObject(catalog[name]);
+                    		}
+            			},
+            			function errorCallback(response){
+            				// failure callback,handle error here
+            				console.log('error');
+            			}
+            	).catch(showRestError);;
+			};
+			
+			/* Updates the hint for the query, according to the
+			 * selected search type. Sparql (1), Text (2).
+			 */
+			$scope.radioChecked = function radioChecked(type) {
+				
+				if (type == 1) {
+					$scope.placeholder = '?s ?p ?o.';
+				} else {
+					$scope.placeholder = 'word1 AND word2';
+				}
+				$scope.apply();
+			};
 
             return self;
         }
