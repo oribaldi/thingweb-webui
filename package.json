@@ -1,6 +1,6 @@
 {
   "name": "thingweb-webui",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "W3C WoT \"current practices\" compliant client web application",
   "main": "index.html",
   "scripts": {
@@ -25,7 +25,10 @@
     "url": "https://github.com/thingweb/thingweb-webui/issues"
   },
   "homepage": "https://github.com/thingweb/thingweb-webui#readme",
-  "dependencies": {},
+  "dependencies": {
+	  "coap": "^0.17.0",
+	  "express": "^4.14.0"
+  },
   "devDependencies": {
     "del": "^2.2.0",
     "gulp": "^3.9.1",
