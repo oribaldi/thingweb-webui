@@ -140,17 +140,28 @@ angular.module("thingclient").controller('ThingClientCtrl',
                             $mdDialog.cancel();
                         };
                         this.submit = function() {
-                            $mdDialog.hide();
-                            $http.get(this.uri)
-                            .then(function(response) {
-                                var catalog = response.data;
-                                console.log(catalog);
-                                for(var name in catalog) {
-                                    console.log("found " + name);
-                                    self.addThingFromObject(catalog[name]);    
-                                }
-                            })
-                            .catch(showRestError);
+                            
+                            // Validate uri
+                            var URL_REGEXP = /^(http?|coap)s?:\/\/(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(?::\d+)?(?:\/?|[\/?]\S+)$/gi;
+                            if (URL_REGEXP.test(this.uri)) {
+                            	
+                            	$mdDialog.hide();
+                            	
+                            	$http.get(this.uri)
+                                .then(function(response) {
+                                    var catalog = response.data;
+                                    console.log(catalog);
+                                    for(var name in catalog) {
+                                        console.log("found " + name);
+                                        self.addThingFromObject(catalog[name]);    
+                                    }
+                                })
+                                .catch(showRestError);
+                            	
+                            } else {
+                            	alert("Not a valid URL, please try again!");
+                            }
+                            
                         };
                     },
                     controllerAs: 'dialog',
@@ -160,35 +171,7 @@ angular.module("thingclient").controller('ThingClientCtrl',
             }
             
             self.addThingwebRepo = function addThingWebRepo($event) {
-            	
-            	// Setup server event
-                source = new EventSource('/loadTD');
-                source.addEventListener('observing', function (event) {
-                	
-                	//self.addThingFromObject(event.data);
-                	
-                	$scope.$apply(function () {
-
-                		$scope.things = [];
-                		$scope.isGeneral = false;
-                		
-                		var catalog = JSON.parse(event.data);
-                		for (var name in catalog) {
-                			console.log("found " + name);
-                			self.addThingFromObject(catalog[name]);
-                		}
-                		
-                		self.selected = {};
-                		
-                		if ($scope.things.length !== 0) {
-        					$scope.noThings = false;
-        				} else {
-        					$scope.Things = true;
-        				}
-                	});
-                }, false);
-            	
-            	/*
+            		
             	$mdDialog.show({
                     clickOutsideToClose: true,
                     controller: function($mdDialog) {
@@ -199,30 +182,48 @@ angular.module("thingclient").controller('ThingClientCtrl',
                             $mdDialog.cancel();
                         };
                         this.submit = function() {
-                            $mdDialog.hide();
-                            
-                            // Setup server event
-                            source = new EventSource('/loadTD/' + this.uri);
-                            source.addEventListener('observing', function (event) {
-                            	$scope.$apply(function () {
-                            		
-                            		self.selected = {};
-                            		$scope.things = JSON.parse(event.data);
-                            		if ($scope.things.length !== 0) {
-                    					$scope.noThings = false;
-                    				} else {
-                    					$scope.Things = true;
-                    				}
-                            	});
-                            }, false);
-                            
+                        	
+                        	// Validate uri
+                            var URL_REGEXP = /^(coap)s?:\/\/(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(?::\d+)?(?:\/?|[\/?]\S+)$/gi;
+                            if (URL_REGEXP.test(this.uri)) {
+                            	
+                            	$mdDialog.hide();
+                            	
+                            	// Setup server event
+                                source = new EventSource('/loadTD');
+                                source.addEventListener('observing', function (event) {
+                                	
+                                	$scope.$apply(function () {
+
+                                		$scope.things = [];
+                                		$scope.isGeneral = false;
+                                		
+                                		var catalog = JSON.parse(event.data);
+                                		for (var name in catalog) {
+                                			console.log("found " + name);
+                                			self.addThingFromObject(catalog[name]);
+                                		}
+                                		
+                                		self.selected = {};
+                                		
+                                		if ($scope.things.length !== 0) {
+                        					$scope.noThings = false;
+                        				} else {
+                        					$scope.Things = true;
+                        				}
+                                	});
+                                }, false);
+                            	
+                            } else {
+                            	alert("Not a valid CoAP URL, please try again!");
+                            }    
                         };
                     },
                     controllerAs: 'dialog',
                     templateUrl: 'uridialog.html',
                     targetEvent: $event
                 });
-            	*/
+            	
             	
             }
             
