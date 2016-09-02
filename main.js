@@ -6,10 +6,11 @@ var express = require('express');
 var path    = require('path');
 
 // For ThingWeb Repository
-var coap    = require('coap');
-var events  = require('events');
-var util = require('util');
-
+'use strict';
+var URL    = require('url-parse');
+var coap   = require('coap');
+var events = require('events');
+var util   = require('util');
 
 // The server configuration
 var app  = express();
@@ -27,13 +28,32 @@ app.use('/js', express.static(__dirname + '/js'));
 
 
 // ### Routing for Thingweb Repository ###
+var twrUrl;
 
 //For observe events
 function ObserveRequest() { }
 util.inherits(ObserveRequest, events.EventEmitter);
 
+function parseURL(rawURL) {
+	
+	var url = new URL(rawURL, true);
+	
+	if (!url.port) {
+		url.set('port', 5683);
+	}
+	
+	if (!url.pathname || url.pathname == '/') {
+		url.set('pathname', '/td');
+	}
+	
+	return url
+}
+
 // GET TDs from repository by an observe request
-app.get('/loadTD',function(rq, res) {
+app.get('/loadTD/:twrUri',function(rq, res) {
+	
+	twrUrl = parseURL(rq.params.twrUri); 
+	console.log(twrUrl.pathname);
 	
 	// set timeout as high as possible
     rq.socket.setTimeout(60000);
@@ -47,15 +67,16 @@ app.get('/loadTD',function(rq, res) {
     res.write("\n");
     
     // set CoAP Request
-	var coapReq = {
-		hostname: 'localhost',
-		host: 'localhost',
-		port: 5683,
-		pathname: '/td',
-		observe: true,
-		multicast: true,
-		multicastTimeout: 40000
-	};
+    var coapReq = {
+    	hostname: twrUrl.hostname,
+    	host: twrUrl.host,
+    	port: twrUrl.port,
+    	pathname: twrUrl.pathname,
+    	observe: true,
+    	multicast: true,
+    	multicastTimeout: 40000
+    };
+
 	var result = '';
 	
 	function startObserver(res2) {
@@ -82,7 +103,7 @@ app.get('/loadTD',function(rq, res) {
 			req.removeListener('observing', startObserver);
 		});
 		
-		req.on('error', function() {
+		req.on('error', function(err) {
 			console.log(err);
 		});
 		
@@ -94,7 +115,7 @@ app.get('/loadTD',function(rq, res) {
 });
 
 app.get('/searchTD',function(rq, res){
-	var url = 'coap://localhost:5683/td';
+
 	var queryType = rq.query.queryType;
 	var param = '';
 	
@@ -106,7 +127,7 @@ app.get('/searchTD',function(rq, res){
 	}
 	
     // Send CoAP Request
-	req   = coap.request(url + param);
+	req   = coap.request(twrUrl + param);
 	req.on('response', function(res2) {
 		var result = res2.payload;
 		var j = JSON.parse(result);

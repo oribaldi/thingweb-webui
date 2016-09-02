@@ -190,7 +190,7 @@ angular.module("thingclient").controller('ThingClientCtrl',
                             	$mdDialog.hide();
                             	
                             	// Setup server event
-                                source = new EventSource('/loadTD');
+                                source = new EventSource('/loadTD/' + encodeURIComponent(this.uri));
                                 source.addEventListener('observing', function (event) {
                                 	
                                 	$scope.$apply(function () {
