@@ -155,8 +155,7 @@ angular.module("thingclient").controller('ThingClientCtrl',
                                         console.log("found " + name);
                                         self.addThingFromObject(catalog[name]);    
                                     }
-                                })
-                                .catch(showRestError);
+                                }).catch(showRestError);
                             	
                             } else {
                             	alert("Not a valid URL, please try again!");
@@ -251,7 +250,7 @@ angular.module("thingclient").controller('ThingClientCtrl',
             				// failure callback,handle error here
             				console.log('error');
             			}
-            	).catch(showRestError);;
+            	).catch(showRestError);
 			};
 			
 			/* Updates the hint for the query, according to the

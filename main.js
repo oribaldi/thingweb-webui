@@ -39,10 +39,12 @@ function parseURL(rawURL) {
 	var url = new URL(rawURL, true);
 	
 	if (!url.port) {
+		// default coap port
 		url.set('port', 5683);
 	}
 	
 	if (!url.pathname || url.pathname == '/') {
+		// default pathname
 		url.set('pathname', '/td');
 	}
 	

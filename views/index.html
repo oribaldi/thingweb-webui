@@ -57,7 +57,7 @@
         </md-list>
 
         <md-fab-speed-dial md-open="isOpen" md-direction="right" class="md-scale" md-hover-full="true" ng-mouseenter="isOpen=true"
-        ng-mouseleave="isOpen=false">
+        ng-mouseleave="isOpen=false" ng-show="isGeneral">
             <md-fab-trigger>
                 <md-button aria-label="Add Thing" class="md-fab md-primary">
                     <md-icon>add</md-icon>
@@ -65,15 +65,15 @@
                 </md-button> Add...
             </md-fab-trigger>
             <md-fab-actions>
-                <md-button aria-label="add from uri" ng-show="isGeneral" class="md-fab md-raised md-mini" ng-click="tcc.openUriDialog($event,'uri')">
+                <md-button aria-label="add from uri" class="md-fab md-raised md-mini" ng-click="tcc.openUriDialog($event,'uri')">
                     <md-icon>cloud_download</md-icon>
                     <md-tooltip>add from uri</md-tooltip>
                 </md-button>
-                <md-button aria-label="add from file" ng-show="isGeneral" class="md-fab md-raised md-mini" ng-click="tcc.addFileFromPicker('tdFilePicker')">
+                <md-button aria-label="add from file" class="md-fab md-raised md-mini" ng-click="tcc.addFileFromPicker('tdFilePicker')">
                     <md-icon>attachment</md-icon>
                     <md-tooltip>add from file</md-tooltip>
                 </md-button>
-                 <md-button aria-label="add from repo" ng-show="isGeneral" class="md-fab md-raised md-mini" ng-click="tcc.addCatalog($event)">
+                 <md-button aria-label="add from repo" class="md-fab md-raised md-mini" ng-click="tcc.addCatalog($event)">
                     <md-icon>local_library</md-icon>
                     <md-tooltip>add from repo</md-tooltip>
                 </md-button>
@@ -210,7 +210,7 @@
             </section>
             <br/>
 
-            <section class="md-whiteframe-2dp"  flex>
+            <section class="md-whiteframe-2dp"  >
                 <md-toolbar class="md-primary">
                     <div class="md-toolbar-tools">
                         <h2>Properties</h2>
@@ -279,7 +279,7 @@
                     </li>
                 </ul>
             </section>
-
+			<br/>
         </md-content>
 
     </div>
