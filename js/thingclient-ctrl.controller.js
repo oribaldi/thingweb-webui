@@ -192,26 +192,35 @@ angular.module("thingclient").controller('ThingClientCtrl',
                                 source = new EventSource('/loadTD/' + encodeURIComponent(this.uri));
                                 source.addEventListener('observing', function (event) {
                                 	
-                                	$scope.$apply(function () {
+                                	if (event.data == 'close') {
+                                		event.target.close();
+                                		source.close();
+                                		
+                                	} else {
+                                		
+                                		$scope.$apply(function () {
 
-                                		$scope.things = [];
-                                		$scope.isGeneral = false;
-                                		
-                                		var catalog = JSON.parse(event.data);
-                                		for (var name in catalog) {
-                                			console.log("found " + name);
-                                			self.addThingFromObject(catalog[name]);
-                                		}
-                                		
-                                		self.selected = {};
-                                		
-                                		if ($scope.things.length !== 0) {
-                        					$scope.noThings = false;
-                        				} else {
-                        					$scope.Things = true;
-                        				}
-                                	});
+                                    		$scope.things = [];
+                                    		$scope.isGeneral = false;
+                                    		
+                                    		var catalog = JSON.parse(event.data);
+                                    		for (var name in catalog) {
+                                    			//console.log("found " + name);
+                                    			self.addThingFromObject(catalog[name]);
+                                    		}
+                                    		
+                                    		self.selected = {};
+                                    		
+                                    		if ($scope.things.length !== 0) {
+                            					$scope.noThings = false;
+                            				} else {
+                            					$scope.noThings = true;
+                            				}
+                                    	});
+                                	}
+                                	
                                 }, false);
+                                
                             	
                             } else {
                             	alert("Not a valid CoAP URL, please try again!");
@@ -245,6 +254,10 @@ angular.module("thingclient").controller('ThingClientCtrl',
                     			console.log("found " + name);
                     			self.addThingFromObject(catalog[name]);
                     		}
+            				
+            				if ($scope.things.length == 0) {
+            					$scope.things = [{name: 'No TD matched the query'}];
+            				}
             			},
             			function errorCallback(response){
             				// failure callback,handle error here

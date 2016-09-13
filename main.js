@@ -30,10 +30,6 @@ app.use('/js', express.static(__dirname + '/js'));
 // ### Routing for Thingweb Repository ###
 var twrUrl;
 
-//For observe events
-function ObserveRequest() { }
-util.inherits(ObserveRequest, events.EventEmitter);
-
 function parseURL(rawURL) {
 	
 	var url = new URL(rawURL, true);
@@ -54,8 +50,7 @@ function parseURL(rawURL) {
 // GET TDs from repository by an observe request
 app.get('/loadTD/:twrUri',function(rq, res) {
 	
-	twrUrl = parseURL(rq.params.twrUri); 
-	console.log(twrUrl.pathname);
+	twrUrl = parseURL(rq.params.twrUri);
 	
 	// set timeout as high as possible
     rq.socket.setTimeout(60000);
@@ -67,23 +62,19 @@ app.get('/loadTD/:twrUri',function(rq, res) {
         'Connection': 'keep-alive'
     });
     res.write("\n");
-    
-    // set CoAP Request
+	
+	// set CoAP Request
     var coapReq = {
     	hostname: twrUrl.hostname,
     	host: twrUrl.host,
     	port: twrUrl.port,
     	pathname: twrUrl.pathname,
-    	observe: true,
-    	multicast: true,
-    	multicastTimeout: 40000
+    	observe: true
     };
-
-	var result = '';
-	
-	function startObserver(res2) {
+    
+    function startObserver(res2) {
 		
-		console.log("Received notification...");
+		//console.log("Received notification...");
 		
 		// send response through event
 		var result = JSON.parse(res2.payload);
@@ -91,29 +82,30 @@ app.get('/loadTD/:twrUri',function(rq, res) {
 		res.write("data: " + JSON.stringify(result) + "\n\n");
 		
 	}
+    
+    // send CoAP request
+	req = coap.request(coapReq);
 	
-	var request = new ObserveRequest();
-	request.on('subscribe', function(coapReq) {
-		
-		// send CoAP request
-		req = coap.request(coapReq);
-		
-		req.on('response', startObserver);
-		
-		req.on('close', function(err) {
-			console.log("Closing observer ...\n");
-			req.removeListener('observing', startObserver);
-		});
-		
-		req.on('error', function(err) {
-			console.log(err);
-		});
-		
-		req.end();
-		
+	req.on('response', startObserver);
+	
+	req.on('close', function(err) {
+		console.log("Closing observer ...\n");
+		req.removeListener('observing', startObserver);
 	});
-	request.emit('subscribe', coapReq);
 	
+	req.on('error', function(err) {
+		console.log(err);
+		res.write("event: observing\n");
+		res.write("data: close\n\n");
+	});
+	
+	req.on('end', function(err) {
+		console.log('End of observation ...');
+		res.write("event: observing\n");
+		res.write("data: close\n\n");
+	});
+	
+	req.end();
 });
 
 app.get('/searchTD',function(rq, res){
